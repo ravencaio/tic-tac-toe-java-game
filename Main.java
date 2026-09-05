@@ -1,30 +1,25 @@
 import java.util.Scanner;
 
 class Main {
-    public static void main(){
-        Scanner scnr = new Scanner(System.in);
+    public static void main(String[] args){
+        Scanner scanner = new Scanner(System.in);
 
-        Player pl1 = new Player("O", -1);
-        Player pl2 = new Player("X", 1);
+        Player pl1 = new Player("O");
+        Player pl2 = new Player("X");
 
-        Player vez = pl1;
+        Player turn = pl1;
 
-        Board board = new Board(3, pl1, pl2);
+        Board board = new Board(pl1, pl2, 4);
 
-        while (board.playerWon() == null && !board.isNotDrawn()) {
+        while (board.playerWon() == null && !board.isDrawn()) {
             board.printBoard();
-            System.out.printf("Vez do jogador de símbolo %s, digite linha e coluna: ", vez.playerChar);
-            String[] jogada = scnr.nextLine().split(" ");
-            int jogadaX = Integer.parseInt(jogada[0]);
-            int jogadaY = Integer.parseInt(jogada[1]);
-
-            while (!board.addChar(jogadaX - 1, jogadaY - 1, vez)) {
-                    System.err.printf("Jogada inválida!, tente novamente\n");
-                    jogada = scnr.nextLine().split(" ");
-                    jogadaX = Integer.parseInt(jogada[0]);
-                    jogadaY = Integer.parseInt(jogada[1]);
+            System.out.printf("Vez do jogador de símbolo %s, digite linha e coluna: ", turn.playerChar);
+            int[] play = readPlay(scanner);
+            while (!board.addChar(play[0]- 1, play[1] - 1, turn)) {
+                System.err.println("Jogada inválida! Tente novamente.");
+                play = readPlay(scanner);
             }
-            vez = (vez == pl1) ? pl2 : pl1;
+            turn = (turn == pl1) ? pl2 : pl1;
         }
         if (board.playerWon() != null) {
             board.printBoard();
@@ -35,6 +30,24 @@ class Main {
         System.out.printf("O jogo empatou!");
     }
 
+    private static int[] readPlay(Scanner scanner){
+        int[] coordinates = new int[2];
+        while (true) {
+            String[] playRaw = scanner.nextLine().split(" ");
+            if (playRaw.length == 2) {
+                try {
+                    coordinates[0] = Integer.parseInt(playRaw[0]);
+                    coordinates[1] = Integer.parseInt(playRaw[1]);
+                    return coordinates;
+                } catch (NumberFormatException e) {
+
+                }
+
+            }
+
+            System.err.println("Entrada errada! tente novamente.");
+        }
+    }
 
 
 }

@@ -1,22 +1,24 @@
 class Board
 {
-    int winCondition;
-    int playsLeft = 9;
+    int playsLeft;
     Cell[][] board;
+    int squareSize;
+
 
     Player pl1;
     Player pl2;
 
-    public Board(int winCondition, Player pl1, Player pl2)
+    public Board(Player pl1, Player pl2, int squareSize)
     {
-        this.winCondition = winCondition;
         this.pl1 = pl1;
         this.pl2 = pl2;
-        this.board = new Cell[3][3];
+        this.squareSize = squareSize;
+        this.playsLeft = squareSize * squareSize;
+        this.board = new Cell[squareSize][squareSize];
 
-        for(int i = 0; i < 3; i++)
+        for(int i = 0; i < squareSize; i++)
         {
-            for(int j = 0; j < 3; j++)
+            for(int j = 0; j < squareSize; j++)
             {
                 this.board[i][j] = new Cell(i, j);
             }
@@ -25,7 +27,7 @@ class Board
 
     private boolean cellValidToTake(int xPos, int yPos)
     {
-        return (0 <= xPos && xPos <= 2) && (0 <= yPos && yPos <= 2) && this.board[xPos][yPos].isEmpty();
+        return (0 <= xPos && xPos <= this.squareSize - 1) && (0 <= yPos && yPos <= this.squareSize - 1) && this.board[xPos][yPos].isEmpty();
     }
 
     public boolean addChar(int xPos, int yPos, Player pl)
@@ -37,7 +39,7 @@ class Board
         return true;
     }
 
-    public boolean isNotDrawn()
+    public boolean isDrawn()
     {
         return (this.playsLeft == 0);
     }
@@ -57,27 +59,43 @@ class Board
 
     private boolean checkRow(int row, Player pl)
     {
-        return !board[row][0].isEmpty() && board[row][0].getOccupant() == pl && !board[row][1].isEmpty() && board[row][1].getOccupant() == pl && !board[row][2].isEmpty() && board[row][2].getOccupant() == pl;
+        for (int i = 0; i < squareSize; i++) { if(board[row][i].isEmpty() || board[row][i].getOccupant() != pl) return false;}
+        return true;
     }
 
     private boolean checkCol(int col, Player pl)
     {
-        return !board[0][col].isEmpty() && board[0][col].getOccupant() == pl && !board[1][col].isEmpty() && board[1][col].getOccupant() == pl && !board[2][col].isEmpty() && board[2][col].getOccupant() == pl;
+        for (int i = 0; i < squareSize; i++) { if(board[i][col].isEmpty() || board[i][col].getOccupant() != pl) return false;}
+        return true;
     }
 
     private boolean checkDiagonals(Player pl)
     {
-        boolean principal = !board[0][0].isEmpty() && board[0][0].getOccupant() == pl && !board[1][1].isEmpty() && board[1][1].getOccupant() == pl && !board[2][2].isEmpty() && board[2][2].getOccupant() == pl;
+        boolean principal = true;
+        boolean secundaria = true;
 
-        boolean secundaria = !board[0][2].isEmpty() && board[0][2].getOccupant() == pl && !board[1][1].isEmpty() && board[1][1].getOccupant() == pl && !board[2][0].isEmpty() && board[2][0].getOccupant() == pl;
+        // Checar a diagonal principal
+        for (int i = 0; i < squareSize; i++){
+            if (board[i][i].getOccupant() != pl){
+                principal = false;
+                break;
+            }
+        }
+        for (int i = 0; i < squareSize; i++){
+            if (board[squareSize-1-i][i].getOccupant() != pl){
+                secundaria = false;
+                break;
+            }
+        }
+
 
         return principal || secundaria;
     }
 
     public void printBoard(){
-        for(int i = 0; i < 3; i++)
+        for(int i = 0; i < squareSize; i++)
         {
-            for(int j = 0; j < 3; j++)
+            for(int j = 0; j < squareSize; j++)
             {
                 System.out.print(this.board[i][j]);
             }
