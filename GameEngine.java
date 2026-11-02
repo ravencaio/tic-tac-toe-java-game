@@ -9,7 +9,7 @@ public class GameEngine {
 
     public GameEngine(GameConfig config) {
         this.config = config;
-        this.board = new Board(config.boardSize);
+        this.board = new Board(config.rows, config.cols, config.placementRule);
         this.players = new ArrayList<>();
 
         for (String symbol : config.playerSymbols) {
@@ -53,16 +53,24 @@ public class GameEngine {
     private int[] readPlay(Scanner scanner) {
         int[] coordinates = new int[2];
         while (true) {
-            String[] playRaw = scanner.nextLine().split(" ");
-            if (playRaw.length == 2) {
-                try {
+            String[] playRaw = scanner.nextLine().trim().split("\\s+");
+
+            try {
+                if (playRaw.length == 2) {
                     coordinates[0] = Integer.parseInt(playRaw[0]);
                     coordinates[1] = Integer.parseInt(playRaw[1]);
                     return coordinates;
-                } catch (NumberFormatException e) {
+                } else if (playRaw.length == 1) {
+                    coordinates[0] = 1;
+                    coordinates[1] = Integer.parseInt(playRaw[0]);
+                    return coordinates;
                 }
             }
-            System.err.println("Entrada errada! tente novamente.");
+            catch (NumberFormatException e) {
+
+            }
+
+            System.err.println("Entrada errada! Digite 'linha coluna' ou apenas 'coluna'.");
         }
     }
 }

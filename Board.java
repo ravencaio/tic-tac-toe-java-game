@@ -1,28 +1,29 @@
 class Board {
     int playsLeft;
     Cell[][] board;
-    int squareSize;
+    int rows;
+    int cols;
+    PlacementRule rule;
 
-    public Board(int squareSize) {
-        this.squareSize = squareSize;
-        this.playsLeft = squareSize * squareSize;
-        this.board = new Cell[squareSize][squareSize];
+    public Board(int rows, int cols, PlacementRule rule) {
+        this.rows = rows;
+        this.cols = cols;
+        this.rule = rule;
+        this.playsLeft = rows * cols;
+        this.board = new Cell[rows][cols];
 
-        for (int i = 0; i < squareSize; i++) {
-            for (int j = 0; j < squareSize; j++) {
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
                 this.board[i][j] = new Cell(i, j);
             }
         }
     }
 
-    private boolean cellValidToTake(int xPos, int yPos) {
-        return (0 <= xPos && xPos < this.squareSize) && (0 <= yPos && yPos < this.squareSize) && this.board[xPos][yPos].isEmpty();
-    }
-
     public boolean addChar(int xPos, int yPos, Player pl) {
-        if (!cellValidToTake(xPos, yPos)) return false;
+        int[] finalPos = rule.getValidPlacement(this.board, xPos, yPos);
+        if (finalPos == null) return false;
 
-        this.board[xPos][yPos].setOccupant(pl);
+        this.board[finalPos[0]][finalPos[1]].setOccupant(pl);
         this.playsLeft -= 1;
         return true;
     }
@@ -32,14 +33,14 @@ class Board {
     }
 
     public boolean checkWin(Player pl, int winCondition) {
-        for (int r = 0; r < squareSize; r++) {
-            for (int c = 0; c < squareSize; c++) {
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
                 if (board[r][c].isEmpty() || board[r][c].getOccupant() != pl) continue;
 
-                if (c + winCondition <= squareSize && checkDirection(r, c, 0, 1, pl, winCondition)) return true;
-                if (r + winCondition <= squareSize && checkDirection(r, c, 1, 0, pl, winCondition)) return true;
-                if (r + winCondition <= squareSize && c + winCondition <= squareSize && checkDirection(r, c, 1, 1, pl, winCondition)) return true;
-                if (r + winCondition <= squareSize && c - winCondition + 1 >= 0 && checkDirection(r, c, 1, -1, pl, winCondition)) return true;
+                if (c + winCondition <= cols && checkDirection(r, c, 0, 1, pl, winCondition)) return true;
+                if (r + winCondition <= rows && checkDirection(r, c, 1, 0, pl, winCondition)) return true;
+                if (r + winCondition <= rows && c + winCondition <= cols && checkDirection(r, c, 1, 1, pl, winCondition)) return true;
+                if (r + winCondition <= rows && c - winCondition + 1 >= 0 && checkDirection(r, c, 1, -1, pl, winCondition)) return true;
             }
         }
         return false;
@@ -55,8 +56,8 @@ class Board {
     }
 
     public void printBoard() {
-        for (int i = 0; i < squareSize; i++) {
-            for (int j = 0; j < squareSize; j++) {
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
                 System.out.print(this.board[i][j]);
             }
             System.out.println();

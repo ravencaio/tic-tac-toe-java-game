@@ -3,25 +3,31 @@ import java.io.IOException;
 import java.util.Properties;
 
 public class GameConfig {
-    public int boardSize;
+    public int rows;
+    public int cols;
     public String[] playerSymbols;
     public int winCondition;
+    public PlacementRule placementRule;
 
     public void loadFromFile(String filePath) {
         Properties properties = new Properties();
-
         try (FileInputStream file = new FileInputStream(filePath)) {
             properties.load(file);
 
-            this.boardSize = Integer.parseInt(properties.getProperty("tamanho_tabuleiro", "3"));
+            this.rows = Integer.parseInt(properties.getProperty("linhas", "3"));
+            this.cols = Integer.parseInt(properties.getProperty("colunas", "3"));
             this.playerSymbols = properties.getProperty("jogadores", "X,O").split(",");
             this.winCondition = Integer.parseInt(properties.getProperty("condicao_vitoria", "3"));
 
-        } catch (IOException e) {
-            System.err.println("Erro ao carregar o ficheiro de configuração: " + e.getMessage());
-            System.exit(1);
-        } catch (NumberFormatException e) {
-            System.err.println("Erro de formatação. Verifique se os valores do tabuleiro e vitória são numéricos.");
+            String ruleType = properties.getProperty("regra_posicionamento", "NORMAL");
+            if (ruleType.equals("GRAVIDADE")) {
+                this.placementRule = new GravityPlacement();
+            } else {
+                this.placementRule = new NormalPlacement();
+            }
+
+        } catch (IOException | NumberFormatException e) {
+            System.err.println("Erro ao carregar ficheiro: " + e.getMessage());
             System.exit(1);
         }
     }
