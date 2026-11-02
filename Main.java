@@ -17,7 +17,7 @@ public class Main {
 
         switch (opcao) {
             case "1":
-                filePath = "velha.properties";
+                filePath = "tic-tac-toe.properties";
                 break;
             case "2":
                 filePath = "connect4.properties";
