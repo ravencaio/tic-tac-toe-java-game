@@ -9,10 +9,9 @@ public class GameEngine {
 
     public GameEngine(GameConfig config) {
         this.config = config;
-        this.board = new Board(config.boardSize); // Passa apenas o tamanho do tabuleiro
+        this.board = new Board(config.boardSize);
         this.players = new ArrayList<>();
 
-        // Cria os jogadores baseados no arquivo Settings.properties
         for (String symbol : config.playerSymbols) {
             players.add(new Player(symbol.trim()));
         }
@@ -34,7 +33,6 @@ public class GameEngine {
                 play = readPlay(scanner);
             }
 
-            // A engine agora passa a condição de vitória dinâmica para o tabuleiro
             if (board.checkWin(turn, config.winCondition)) {
                 gameWon = true;
                 board.printBoard();
@@ -42,7 +40,6 @@ public class GameEngine {
                 break;
             }
 
-            // Alterna para o próximo jogador dinamicamente
             turnIndex = (turnIndex + 1) % players.size();
             turn = players.get(turnIndex);
         }
