@@ -1,102 +1,62 @@
-class Board
-{
+class Board {
     int playsLeft;
     Cell[][] board;
     int squareSize;
 
-
-    Player pl1;
-    Player pl2;
-
-    public Board(Player pl1, Player pl2, int squareSize)
-    {
-        this.pl1 = pl1;
-        this.pl2 = pl2;
+    public Board(int squareSize) {
         this.squareSize = squareSize;
         this.playsLeft = squareSize * squareSize;
         this.board = new Cell[squareSize][squareSize];
 
-        for(int i = 0; i < squareSize; i++)
-        {
-            for(int j = 0; j < squareSize; j++)
-            {
+        for (int i = 0; i < squareSize; i++) {
+            for (int j = 0; j < squareSize; j++) {
                 this.board[i][j] = new Cell(i, j);
             }
         }
     }
 
-    private boolean cellValidToTake(int xPos, int yPos)
-    {
-        return (0 <= xPos && xPos <= this.squareSize - 1) && (0 <= yPos && yPos <= this.squareSize - 1) && this.board[xPos][yPos].isEmpty();
+    private boolean cellValidToTake(int xPos, int yPos) {
+        return (0 <= xPos && xPos < this.squareSize) && (0 <= yPos && yPos < this.squareSize) && this.board[xPos][yPos].isEmpty();
     }
 
-    public boolean addChar(int xPos, int yPos, Player pl)
-    {
-        if(!cellValidToTake(xPos, yPos)) return false;
+    public boolean addChar(int xPos, int yPos, Player pl) {
+        if (!cellValidToTake(xPos, yPos)) return false;
 
         this.board[xPos][yPos].setOccupant(pl);
         this.playsLeft -= 1;
         return true;
     }
 
-    public boolean isDrawn()
-    {
+    public boolean isDrawn() {
         return (this.playsLeft == 0);
     }
 
-    public Player playerWon() {
-        for(int i = 0; i < 3; i++)
-        {
-            if(checkRow(i, pl1) || checkCol(i, pl1)) return pl1;
-            if(checkRow(i, pl2) || checkCol(i, pl2)) return pl2;
+    public boolean checkWin(Player pl, int winCondition) {
+        for (int r = 0; r < squareSize; r++) {
+            for (int c = 0; c < squareSize; c++) {
+                if (board[r][c].isEmpty() || board[r][c].getOccupant() != pl) continue;
+
+                if (c + winCondition <= squareSize && checkDirection(r, c, 0, 1, pl, winCondition)) return true;
+                if (r + winCondition <= squareSize && checkDirection(r, c, 1, 0, pl, winCondition)) return true;
+                if (r + winCondition <= squareSize && c + winCondition <= squareSize && checkDirection(r, c, 1, 1, pl, winCondition)) return true;
+                if (r + winCondition <= squareSize && c - winCondition + 1 >= 0 && checkDirection(r, c, 1, -1, pl, winCondition)) return true;
+            }
         }
-
-        if(checkDiagonals(pl1)) return pl1;
-        if(checkDiagonals(pl2)) return pl2;
-
-        return null;
+        return false;
     }
 
-    private boolean checkRow(int row, Player pl)
-    {
-        for (int i = 0; i < squareSize; i++) { if(board[row][i].isEmpty() || board[row][i].getOccupant() != pl) return false;}
+    private boolean checkDirection(int startRow, int startCol, int rowDir, int colDir, Player pl, int winCondition) {
+        for (int i = 0; i < winCondition; i++) {
+            int currentRow = startRow + (i * rowDir);
+            int currentCol = startCol + (i * colDir);
+            if (board[currentRow][currentCol].getOccupant() != pl) return false;
+        }
         return true;
     }
 
-    private boolean checkCol(int col, Player pl)
-    {
-        for (int i = 0; i < squareSize; i++) { if(board[i][col].isEmpty() || board[i][col].getOccupant() != pl) return false;}
-        return true;
-    }
-
-    private boolean checkDiagonals(Player pl)
-    {
-        boolean principal = true;
-        boolean secundaria = true;
-
-        // Checar a diagonal principal
-        for (int i = 0; i < squareSize; i++){
-            if (board[i][i].getOccupant() != pl){
-                principal = false;
-                break;
-            }
-        }
-        for (int i = 0; i < squareSize; i++){
-            if (board[squareSize-1-i][i].getOccupant() != pl){
-                secundaria = false;
-                break;
-            }
-        }
-
-
-        return principal || secundaria;
-    }
-
-    public void printBoard(){
-        for(int i = 0; i < squareSize; i++)
-        {
-            for(int j = 0; j < squareSize; j++)
-            {
+    public void printBoard() {
+        for (int i = 0; i < squareSize; i++) {
+            for (int j = 0; j < squareSize; j++) {
                 System.out.print(this.board[i][j]);
             }
             System.out.println();
